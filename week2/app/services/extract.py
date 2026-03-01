@@ -6,9 +6,20 @@ from typing import List
 import json
 from typing import Any
 from ollama import chat
+from pydantic import BaseModel
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# Default Ollama model for action-item extraction (small model for lower resource use).
+# Override with OLLAMA_MODEL env var, e.g. OLLAMA_MODEL=llama3.2:3b
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
+
+
+class ActionItemsResponse(BaseModel):
+    """Schema for LLM-structured output: a single field holding the list of action items."""
+
+    action_items: List[str]
 
 BULLET_PREFIX_PATTERN = re.compile(r"^\s*([-*•]|\d+\.)\s+")
 KEYWORD_PREFIXES = (
@@ -64,6 +75,40 @@ def extract_action_items(text: str) -> List[str]:
         seen.add(lowered)
         unique.append(item)
     return unique
+
+
+def extract_action_items_llm(text: str) -> List[str]:
+    """
+    Extract action items from free-form notes using an LLM (Ollama).
+    Returns a list of action item strings. Uses structured output (JSON schema)
+    so the model returns a JSON object with an "action_items" array of strings.
+
+    Requires Ollama to be running locally with the configured model pulled
+    (e.g. `ollama run llama3.2:3b`). Model can be overridden via OLLAMA_MODEL.
+    """
+    stripped = text.strip()
+    if not stripped:
+        return []
+
+    response = chat(
+        model=OLLAMA_MODEL,
+        messages=[
+            {
+                "role": "user",
+                "content": (
+                    "From the following notes, extract all action items, tasks, or to-dos. "
+                    "Return each as a clear, concise phrase. Ignore narrative or non-action text. "
+                    "Return as JSON.\n\n"
+                    f"{stripped}"
+                ),
+            }
+        ],
+        format=ActionItemsResponse.model_json_schema(),
+        options={"temperature": 0},
+    )
+
+    parsed = ActionItemsResponse.model_validate_json(response.message.content)
+    return list(parsed.action_items) if parsed.action_items else []
 
 
 def _looks_imperative(sentence: str) -> bool:

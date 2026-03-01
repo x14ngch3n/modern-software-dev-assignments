@@ -1,3 +1,4 @@
+# Application/assignment repository; not a distributable package (equivalent to Poetry package-mode = false).
 [project]
 name = "modern-software-dev-assignments"
 version = "0.1.0"
@@ -14,12 +15,13 @@ dependencies = [
     "pydantic>=2.0.0",
     "python-dotenv>=1.0.0",
     "openai>=1.0.0",
-    "ollama>=0.5.3",
+    "ollama>=0.5.3,<1.0.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0.0",
+    "flake8>=7.3.0",
     "httpx>=0.24.0",
     "black>=24.1.0",
     "ruff>=0.4.0",
