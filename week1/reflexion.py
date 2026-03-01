@@ -15,7 +15,10 @@ Keep the implementation minimal.
 """
 
 # TODO: Fill this in!
-YOUR_REFLEXION_PROMPT = ""
+YOUR_REFLEXION_PROMPT = """
+You are a coding assistant. The previous implementation of is_valid_password failed some test cases. 
+Please examine the failures carefully, understand the root cause and fix the implementation so that it passes all test cases.
+"""
 
 
 # Ground-truth test suite used to evaluate generated code
@@ -96,7 +99,7 @@ def your_build_reflexion_context(prev_code: str, failures: List[str]) -> str:
 
     Return a string that will be sent as the user content alongside the reflexion system prompt.
     """
-    return ""
+    return f"The previous implementation was:\n```\n{prev_code}\n```\n\nIt failed the following test cases:\n" + "\n".join(f"- {f}" for f in failures)
 
 
 def apply_reflexion(

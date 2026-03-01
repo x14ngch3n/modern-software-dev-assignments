@@ -70,7 +70,14 @@ TOOL_REGISTRY: Dict[str, Callable[..., str]] = {
 # ==========================
 
 # TODO: Fill this in!
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """You are a helpful assistant that excels at calling tools
+You have the following tool available:
+- output_every_func_return_type(file_path: str) -> str: Given a file path,
+
+When asked to call a tool, respond with a single JSON object containing:
+- "tool": the name of the tool to call (string)
+- "args": an object mapping argument names to values (if any)
+"""
 
 
 def resolve_path(p: str) -> str:
@@ -147,7 +154,6 @@ def test_your_prompt(system_prompt: str) -> bool:
         except Exception as exc:
             print(f"Failed to parse tool call: {exc}")
             continue
-        print(call)
         try:
             actual = execute_tool_call(call)
         except Exception as exc:

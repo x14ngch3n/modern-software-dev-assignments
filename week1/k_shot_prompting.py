@@ -6,8 +6,15 @@ load_dotenv()
 
 NUM_RUNS_TIMES = 5
 
-# TODO: Fill this in!
-YOUR_SYSTEM_PROMPT = ""
+# Fill this in!
+YOUR_SYSTEM_PROMPT = """You are a helpful assistant that excels at performing character operations. 
+
+When asked to reverse letters in a word, follow these examples:
+- Input: helloworld -> Output: dlrowolleh
+- Input: httptatus -> Output: sutatsptth
+
+Please remind to keep the original letter case.
+"""
 
 USER_PROMPT = """
 Reverse the order of letters in the following word. Only output the reversed word, no other text:
